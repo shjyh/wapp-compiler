@@ -6,7 +6,7 @@ export default class JSONCompiler implements Compiler {
     private jsonObj: any = null;
 
     private error: Error = null;
-    constructor(private path, private content: string){
+    constructor(private path: string, private content: string){
         this.minify();
     }
     is(path: string): boolean {
@@ -21,7 +21,7 @@ export default class JSONCompiler implements Compiler {
         this.error = null;
         try{
             this.jsonObj = JSON5.parse(this.content);
-            this.minifyJson = JSON5.stringify(this.jsonObj);
+            this.minifyJson = JSON.stringify(this.jsonObj);
         }catch(e){
             this.error = e;
         }

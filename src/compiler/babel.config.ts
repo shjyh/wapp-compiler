@@ -13,7 +13,12 @@ export default function(filename: string): TransformOptions{
                     modules: 'cjs'
                 }
             ],
-            "@babel/preset-typescript"
+            [
+                "@babel/preset-typescript",
+                {
+                    allExtensions: true
+                }
+            ]
         ],
         plugins: [
             [

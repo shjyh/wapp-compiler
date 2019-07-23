@@ -8,10 +8,13 @@ import generateCode from 'pug-code-gen';
 import stripComments from 'pug-strip-comments';
 import runtimeWrapper from 'pug-runtime/wrap';
 
+import stripIndent from 'strip-indent';
+
+import parseAst from './parseAst';
 
 export default class PugCompiler implements Compiler{
     private xmlGenFn: (locals) => string;
-    private error: Error;
+    private error: Error = null;
 
     private watchItems: WatchItem[] = [];
     private methods: string[] = [];
@@ -32,7 +35,9 @@ export default class PugCompiler implements Compiler{
     }
 
     private compile(){
+        this.error = null;
         try{
+            this.content = stripIndent(this.content);
             const ast = link(load.string(this.content, {
                 filename: this.path,
                 lex, parse(tokens, options){
@@ -49,13 +54,29 @@ export default class PugCompiler implements Compiler{
     }
 
     private parseAst(ast){
+        const result = parseAst(ast);
+        this.watchItems = result.watchItems;
+        this.images = result.images;
+        this.methods = result.methods;
+    }
+
+    getMethods(){
+        return this.methods;
+    }
+    
+    getWatchItems(){
+        return this.watchItems;
+    }
+    getImages(){
+        return this.images;
     }
 
     getResult(imageMap: {[key: string]: string}): CompileResult<string> {
-        return {[this.path]: this.xmlGenFn(imageMap)};
+        return {[this.path]: this.xmlGenFn({
+            images: imageMap
+        })};
     }
     getLastError(): Error {
         return this.error;
     }
-
 }

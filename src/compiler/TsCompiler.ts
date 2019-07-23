@@ -12,7 +12,8 @@ export default class TsCompiler implements Compiler{
         private path: string, 
         private content: string, 
         private npmModules: string[],
-        private compress: boolean
+        private compress: boolean,
+        private useRaw: boolean = false
     ){
         this.compile();
     }
@@ -27,14 +28,14 @@ export default class TsCompiler implements Compiler{
     private compile(){
         this.error = null;
         try{
-            const options =  getBabelConfig('/<srcDir>/' + this.path);
-            if(this.compress){
-                options.sourceMaps = false;
+            if(!this.useRaw){
+                const options =  getBabelConfig('/<srcDir>/' + this.path);
+                if(this.compress){
+                    options.sourceMaps = false;
+                }
+                this.transformCode = transformSync(this.content, options).code;
+                this.fixNpmPackage();
             }
-            
-            this.transformCode = transformSync(this.content, options).code;
-            this.fixNpmPackage();
-
             if(this.compress){
                 this.transformCode = minify(this.transformCode, {
                     output: {

@@ -19,11 +19,13 @@ export default function parse(express: string): string[]{
             case 'punctuator':
                 switch(token.value){
                     case '.':
-                        lastName += '.';
+                        if(lastName) lastName += '.';
                         break;
                     case '[':
-                        ++bracks;
-                        lastName += '[';
+                        if(lastName){
+                            ++bracks;
+                            lastName += '[';
+                        }
                         break;
                     case ']':
                         if(bracks<=0) completeLastName();
@@ -31,6 +33,10 @@ export default function parse(express: string): string[]{
                             --bracks;
                             lastName += ']';
                         }
+                        break;
+                    case '(': //函数调用
+                        lastName = '';
+                        bracks = 0;
                         break;
                     default:
                         completeLastName();
@@ -50,7 +56,8 @@ export default function parse(express: string): string[]{
                 
         }
     }
-    if(lastName) vars.push(lastName);
+
+    completeLastName();
 
     return vars;
 
@@ -59,6 +66,7 @@ export default function parse(express: string): string[]{
         if(bracks!==0){
             const index = lastName.lastIndexOf('[');
             lastName = lastName.substr(0, index);
+            if(!lastName) return;
         }
         if(!vars.includes(lastName)){
             vars.push(lastName);
