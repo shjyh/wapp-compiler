@@ -1,0 +1,1 @@
+export default ['iOS >= 8', 'Chrome >= 53'];

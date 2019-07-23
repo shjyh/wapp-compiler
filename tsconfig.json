@@ -1,0 +1,13 @@
+{
+    "extends": "./tsconfig.base",
+    "compilerOptions": {
+        "types": ["node"],
+        "outDir": "./dist"
+    },
+    "include": [
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "./__tests__/**/*"
+    ]
+}
