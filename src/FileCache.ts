@@ -20,6 +20,7 @@ export default class FileCache{
             this.filePaths.push(p);
             this.fileContentMap[p] = content;
             this.changedKeys.push(p);
+            this.runCallback();
             return;
         }
 
@@ -44,6 +45,7 @@ export default class FileCache{
     setFiles(files: {[key: string]: string|Buffer}){
         const setKeys = Object.keys(files);
         const removedFileKeys = this.filePaths.filter(f=>!setKeys.includes(f));
+        
         for(let sk of setKeys){
             this.setFile(sk, files[sk]);
         }
@@ -53,7 +55,7 @@ export default class FileCache{
     }
 
     private getFile(p: string): string|Buffer{
-        return this.fileContentMap[p]||null;
+        return this.fileContentMap[p];
     }
 
     private hasTickSchedular = false;
@@ -68,7 +70,7 @@ export default class FileCache{
                 const realFilePath = path.resolve(this.dist, key);
                 fs.promises.mkdir(path.dirname(realFilePath), {recursive: true}).then(r=>{
                     const fileContent = this.getFile(key);
-                    if(!fileContent){
+                    if(fileContent===null){
                         return fs.promises.unlink(realFilePath);
                     }else{
                         return fs.promises.writeFile(realFilePath, fileContent, {encoding: 'UTF8'});

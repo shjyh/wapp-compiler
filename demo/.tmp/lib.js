@@ -35,6 +35,6 @@ module.exports = {
     c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent'),
     p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage'),
     n: [
-        
+        require('@babel/runtime-corejs3/core-js-stable/object/define-property'),require('@zouke/wapp-lib/make')
     ]
 };

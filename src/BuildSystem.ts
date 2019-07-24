@@ -47,6 +47,10 @@ function setCompilerContent<D extends string|Buffer, T extends Compiler<D>>(comp
     compiler.setContent(content);
 }
 
+function unwrapext(p: string){
+    return path.join(path.dirname(p), path.basename(p, path.extname(p)));
+}
+
 export class BuildSystem {
     private fileSystem: FileCache;
     private spinner: ora.Ora;
@@ -147,7 +151,7 @@ export class BuildSystem {
                     const compiler = new SFCCompiler(
                         this.src, srcRelativePath, readFileAsString(f), this.npmModules, this.compress, this.env
                     );
-                    if(compiler.isPage) this.pages.push(srcRelativePath);
+                    if(compiler.isPage) this.pages.push(unwrapext(srcRelativePath));
                     this.sfcCompilers.push(compiler);
                 }
                 break;
@@ -184,7 +188,7 @@ export class BuildSystem {
                 break;
             case '.vue':
                 removeCompiler(this.sfcCompilers, srcRelativePath, c=>{
-                    if(c.isPage) arrayRemove(this.pages, srcRelativePath);
+                    if(c.isPage) arrayRemove(this.pages, unwrapext(srcRelativePath));
                 });
                 break;
             case '.json':
@@ -204,6 +208,7 @@ export class BuildSystem {
         const extname = path.extname(srcRelativePath);
         switch(extname){
             case '.ts': case '.js': case '.wxs':
+                if(srcRelativePath.endsWith('.d.ts')) break;
                 setCompilerContent(this.tsCompilers, srcRelativePath, readFileAsString(f));
                 break;
             case '.wxml':
@@ -299,7 +304,9 @@ export class BuildSystem {
 
     }
     private buildDebounce(){
-        const debounceFn = debounce(this.build, 500);
+        const debounceFn = debounce(()=>{
+            this.build()
+        }, 500);
         this.buildDebounce = debounceFn;
         debounceFn();
     }
@@ -355,7 +362,7 @@ export class BuildSystem {
             });
             this.fileSystem.setFiles(files);
         }).catch(e=>{
-            console.log(e);
+            console.error(e);
         });
     }
     private insertPageIntoAppJson(appJson, page: string){
@@ -364,7 +371,7 @@ export class BuildSystem {
             for(let subPackage of appJson.subPackages){
                 if(!subPackage.pages) subPackage.pages = [];
                 if(page.startsWith(subPackage.root)){
-                    subPackage.pages.push(page);
+                    subPackage.pages.push(path.relative(subPackage.root, page));
                     continue;
                 }
             }
@@ -381,13 +388,13 @@ export class BuildSystem {
 
             for(let image of images){
                 //root module
-                if(imageManifest[image] === image) continue;
+                if(imageManifest[image] === ('/images/' + image)) continue;
                 if(!subPackages||!imageManifest[image]){
-                    imageManifest[image] = image;
+                    imageManifest[image] = ('/images/' + image);
                     continue;
                 }
 
-                const thisSubPackageImagePath = path.join(subpackage, image);
+                const thisSubPackageImagePath = '/images/' + path.join(subpackage, image);
                 if(imageManifest[image]!==thisSubPackageImagePath){
                     imageManifest[image] = image;
                 }

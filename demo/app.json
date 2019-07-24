@@ -1,3 +1,19 @@
 {
-    "a": "string"
+    "main": "entry/launch.page",
+    "subPackages": [
+        {
+            "root": "app/package"
+        }
+    ],
+    "window":{
+        "backgroundTextStyle":"light",
+        "navigationBarBackgroundColor":"#fff",
+        "navigationBarTextStyle":"black",
+        "onReachBottomDistance":300,
+        "navigationStyle": "custom"
+    },  
+    "networkTimeout": {
+        "request": 60000,
+        "downloadFile": 45000
+    }
 }

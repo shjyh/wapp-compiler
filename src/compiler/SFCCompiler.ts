@@ -44,12 +44,12 @@ export default class SFCCompiler implements Compiler{
             this._isPage = basePath.endsWith('.page');
 
             const configMatch = this.content.match(/<config[\s\S]*?>([\s\S]*?)<\/config>/);
-            if(configMatch&&configMatch[1]){
+            if(configMatch&&configMatch[1]&&configMatch[1].trim()){
                 this.jsonCompiler = new JSONCompiler(basePath + '.json', configMatch[1]);
             }
 
             const wxssMatch = this.content.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/);
-            if(wxssMatch&&wxssMatch[1]){
+            if(wxssMatch&&wxssMatch[1]&&wxssMatch[1].trim()){
                 this.sassCompiler = new SassCompiler(this.src, basePath + '.wxss', wxssMatch[1]);
             }
 
@@ -98,7 +98,10 @@ export default class SFCCompiler implements Compiler{
     }
 
     matchSubpackage(subpackages: string[]): string {
-        return this.pugCompiler.matchSubpackage(subpackages);
+        for(let pack of subpackages){
+            if(this.path.startsWith(pack)) return pack;
+        }
+        return null;
     }
 
     getLastError(): Error {

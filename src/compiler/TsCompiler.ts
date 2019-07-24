@@ -96,7 +96,7 @@ export default class TsCompiler implements Compiler{
     }
 
     getResult(): CompileResult {
-        return { [this.path]: this.transformCode };
+        return { [this.path.replace(/.ts$/, '.js')]: this.transformCode };
     }
     getLastError(){
         return this.error;

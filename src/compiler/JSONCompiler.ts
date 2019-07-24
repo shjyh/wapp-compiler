@@ -3,7 +3,6 @@ import * as JSON5 from 'json5';
 
 export default class JSONCompiler implements Compiler {
     private minifyJson: string = '';
-    private jsonObj: any = null;
 
     private error: Error = null;
     constructor(private path: string, private content: string){
@@ -20,14 +19,13 @@ export default class JSONCompiler implements Compiler {
     private minify(){
         this.error = null;
         try{
-            this.jsonObj = JSON5.parse(this.content);
-            this.minifyJson = JSON.stringify(this.jsonObj);
+            this.minifyJson = JSON.stringify(JSON5.parse(this.content));
         }catch(e){
             this.error = new Error('Error: /<srcDir>/' + this.path + ':\n' + e.message);
         }
     }
     getJsonObj(){
-        return this.jsonObj;
+        return JSON5.parse(this.content);
     }
     getResult(): CompileResult<string> {
         return { [this.path]: this.minifyJson };

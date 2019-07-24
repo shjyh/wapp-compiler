@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "target": "es2016",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noImplicitThis": true,
+        "esModuleInterop": true,
+        "lib": [
+            "esnext"
+        ],
+        "types": ["@zouke/wapp-lib"],
+        "baseUrl": ".",
+        "paths": {
+            "root/*": [
+              "./*"
+            ]
+        },
+    },
+
+    "include": [
+        "./**/*"
+    ]
+}
