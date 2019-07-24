@@ -1,6 +1,6 @@
 import { TransformOptions } from "@babel/core";
 
-export default function(filename: string): TransformOptions{
+export default function(filename?: string): TransformOptions{
     return Object.assign(filename?{
         filename,
         configFile: false,

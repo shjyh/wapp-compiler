@@ -3,6 +3,7 @@ import { transformSync } from '@babel/core';
 import { minify } from 'terser';
 import getBabelConfig from './babel.config';
 import * as path from 'path';
+import conditionParse from '../conditionParse';
 
 export default class TsCompiler implements Compiler{
     private transformCode: string = '';
@@ -13,7 +14,8 @@ export default class TsCompiler implements Compiler{
         private content: string, 
         private npmModules: string[],
         private compress: boolean,
-        private useRaw: boolean = false
+        private env: {[key: string]: boolean|string},
+        private useRaw: boolean = false,
     ){
         this.compile();
     }
@@ -28,6 +30,9 @@ export default class TsCompiler implements Compiler{
     private compile(){
         this.error = null;
         try{
+            if(this.env){
+                this.content = conditionParse(this.content, this.env);
+            }
             if(!this.useRaw){
                 const options =  getBabelConfig('/<srcDir>/' + this.path);
                 if(this.compress){

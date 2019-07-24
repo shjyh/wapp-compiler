@@ -71,6 +71,12 @@ export default class PugCompiler implements Compiler{
         return this.images;
     }
 
+    matchSubpackage(subpackages: string[]): string {
+        for(let pack of subpackages){
+            if(this.path.startsWith(pack)) return pack;
+        }
+        return null;
+    }
     getResult(imageMap: {[key: string]: string}): CompileResult<string> {
         return {[this.path]: this.xmlGenFn({
             images: imageMap

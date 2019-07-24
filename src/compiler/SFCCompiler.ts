@@ -12,6 +12,9 @@ export default class SFCCompiler implements Compiler{
     private pugCompiler: PugCompiler = null;
     private jsonCompiler: JSONCompiler = null;
 
+    private _isPage: boolean = null;
+    get isPage(){ return this._isPage; }
+
     private raw: boolean = false; //使用原始的Page
 
     private error: Error = null;
@@ -20,7 +23,8 @@ export default class SFCCompiler implements Compiler{
         private path: string, 
         private content: string, 
         private npmModules: string[],
-        private compress: boolean
+        private compress: boolean,
+        private env: {[key: string]: boolean|string}
     ){
         this.compile();
     }
@@ -37,6 +41,7 @@ export default class SFCCompiler implements Compiler{
         this.jsonCompiler = this.sassCompiler = this.pugCompiler = this.tsCompiler = null;
         try{
             const basePath = path.join(path.dirname(this.path), path.basename(this.path, path.extname(this.path)));
+            this._isPage = basePath.endsWith('.page');
 
             const configMatch = this.content.match(/<config[\s\S]*?>([\s\S]*?)<\/config>/);
             if(configMatch&&configMatch[1]){
@@ -57,7 +62,7 @@ export default class SFCCompiler implements Compiler{
             if(scriptMatch&&scriptMatch[2]){
                 this.raw = scriptMatch[1] === 'raw';
                 this.tsCompiler = new TsCompiler(
-                    basePath + (this.raw?'':'.factory') +'.js', scriptMatch[2], this.npmModules, this.compress
+                    basePath + (this.raw?'':'.factory') +'.js', scriptMatch[2], this.npmModules, this.compress, this.env
                 )
             };
         }catch(e){
@@ -75,7 +80,7 @@ export default class SFCCompiler implements Compiler{
             const watchItems = this.pugCompiler?this.pugCompiler.getWatchItems():[];
             const methods = this.pugCompiler?this.pugCompiler.getMethods():[]
 
-            result[basePath + '.js'] = `require('${libRelativePath}').p(require('./${parsedPath.name}.factory.js'),${
+            result[basePath + '.js'] = `require('${libRelativePath}').${this.isPage?'p':'c'}(require('./${parsedPath.name}.factory.js'),${
                 JSON.stringify(watchItems)},${JSON.stringify(methods)})`;
         }
 
@@ -90,6 +95,10 @@ export default class SFCCompiler implements Compiler{
     getImages(): string[]{
         if(!this.pugCompiler) return []
         return this.pugCompiler.getImages();
+    }
+
+    matchSubpackage(subpackages: string[]): string {
+        return this.pugCompiler.matchSubpackage(subpackages);
     }
 
     getLastError(): Error {

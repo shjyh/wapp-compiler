@@ -23,7 +23,7 @@ export default class JSONCompiler implements Compiler {
             this.jsonObj = JSON5.parse(this.content);
             this.minifyJson = JSON.stringify(this.jsonObj);
         }catch(e){
-            this.error = e;
+            this.error = new Error('Error: /<srcDir>/' + this.path + ':\n' + e.message);
         }
     }
     getJsonObj(){
