@@ -93,7 +93,7 @@ export default class SFCCompiler implements Compiler{
             }else{
                 genCode.push('Component)')
             }
-            genCode.push(`(require('./${parsedPath.name}.factory.js'),${JSON.stringify(watchItems)},${JSON.stringify(methods)})`);
+            genCode.push(`(require('./${parsedPath.name}.factory.js').default,${JSON.stringify(watchItems)},${JSON.stringify(methods)})`);
             result[basePath + '.js'] = genCode.join('');
         }
 
