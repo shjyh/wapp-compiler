@@ -5,19 +5,19 @@ import chokidar from 'chokidar';
 import { BuildSystem } from './BuildSystem';
 
 export default function run(src: string, dist: string, {
-    watch = true, compress = false, env = null, page = null
+    watch = true, compress = false, env = null, wrapperPath = null
 }: {
     watch?: boolean,
     compress?: boolean,
     env?: {[key: string]: boolean|string},
-    page?: string     //Page来源文件
+    wrapperPath?: string     //Page来源文件
 } = {}){
     del.sync(dist);
 
     src = path.resolve(src);
     dist = path.resolve(dist);
 
-    const buildSystem  = new BuildSystem(src, dist, compress, env, watch, page);
+    const buildSystem  = new BuildSystem(src, dist, compress, env, watch, wrapperPath);
 
     const globPatterns = [path.join(src, '**/*'), '!' + path.join(src, '.tmp/**/*')];
 

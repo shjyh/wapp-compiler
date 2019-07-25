@@ -25,7 +25,7 @@ export default class SFCCompiler implements Compiler{
         private npmModules: string[],
         private compress: boolean,
         private env: {[key: string]: boolean|string},
-        private page: string
+        private wrapperPath: string
     ){
         this.compile();
     }
@@ -83,17 +83,15 @@ export default class SFCCompiler implements Compiler{
             const watchItems = this.pugCompiler?this.pugCompiler.getWatchItems():[];
             const methods = this.pugCompiler?this.pugCompiler.getMethods():[]
 
-            let genCode = [`require('${libRelativePath}').${this.isPage?'p':'c'}(`]
-            if(this.isPage){
-                if(this.page){
-                    genCode.push(`require('${rootRelativePath}/${this.page}').Page)`)
-                }else{
-                    genCode.push('Page)');
-                }
+            let genCode = [];
+            if(this.wrapperPath){
+                genCode.push(`require('${rootRelativePath}/${this.wrapperPath}').`);
+                genCode.push(this.isPage?'Page':'Component');
             }else{
-                genCode.push('Component)')
+                genCode.push(`require('${libRelativePath}').`);
+                genCode.push(this.isPage?'p(Page)':'c(Component)');
             }
-            genCode.push(`(require('./${parsedPath.name}.factory.js').default,${JSON.stringify(watchItems)},${JSON.stringify(methods)})`);
+            genCode.push(`(require('./${parsedPath.name}.factory.js').default,${JSON.stringify(watchItems)},${JSON.stringify(methods)});`);
             result[basePath + '.js'] = genCode.join('');
         }
 

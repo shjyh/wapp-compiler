@@ -32,9 +32,9 @@ function resolveGlobal(global) {
 };
 self=global=resolveGlobal(global);
 module.exports = {
-    c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent'),
-    p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage'),
+    c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent').default,
+    p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage').default,
     n: [
-        require('@babel/runtime-corejs3/core-js-stable/object/define-property'),require('@zouke/wapp-lib/make')
+        require('@babel/runtime-corejs3/core-js-stable/object/define-property'),require('@zouke/wapp-lib/make'),require('@babel/runtime-corejs3/helpers/interopRequireDefault'),require('@zouke/wapp-lib/wrapper/CreateWrapperPage'),require('@zouke/wapp-lib/wrapper/CreateWrapperComponent')
     ]
 };
