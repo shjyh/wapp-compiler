@@ -130,6 +130,7 @@ export class BuildSystem {
         const extname = path.extname(srcRelativePath);
         switch(extname){
             case '.ts': case '.js': case '.wxs':
+                if(srcRelativePath.endsWith('.d.ts')) break;
                 this.tsCompilers.push(new TsCompiler(
                     srcRelativePath,  readFileAsString(f), this.npmModules, 
                     srcRelativePath.endsWith('.min.js') ? false : this.compress, 
@@ -180,6 +181,7 @@ export class BuildSystem {
         const extname = path.extname(srcRelativePath);
         switch(extname){
             case '.ts': case '.js': case '.wxs':
+                if(srcRelativePath.endsWith('.d.ts')) break;
                 removeCompiler(this.tsCompilers, srcRelativePath);
                 break;
             case '.wxml':
