@@ -446,8 +446,8 @@ function resolveGlobal(global) {
 };
 self=global=resolveGlobal(global);
 module.exports = {
-    c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent'),
-    p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage'),
+    c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent').default,
+    p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage').default,
     n: [
         ${this.npmModules.map(n=>`require('${n}')`).join(',')}
     ]
