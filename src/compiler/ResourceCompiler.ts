@@ -16,10 +16,10 @@ export default class ResourceCompiler<T extends string|Buffer = string|Buffer> i
         this.result = content;
     }
     getResult(imageMap: {[key: string]: string}): CompileResult<T> {
-        const dist = imageMap[this.path];
+        const dist = imageMap[path.relative('images', this.path)];
         if(!dist) return {};
         return {
-            [path.resolve(dist, this.path)]: this.result
+            [dist]: this.result
         };
     }
     getLastError(): Error {

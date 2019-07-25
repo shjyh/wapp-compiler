@@ -388,13 +388,13 @@ export class BuildSystem {
 
             for(let image of images){
                 //root module
-                if(imageManifest[image] === ('/images/' + image)) continue;
+                if(imageManifest[image] === ('images/' + image)) continue;
                 if(!subPackages||!imageManifest[image]){
-                    imageManifest[image] = ('/images/' + image);
+                    imageManifest[image] = ('images/' + image);
                     continue;
                 }
 
-                const thisSubPackageImagePath = '/images/' + path.join(subpackage, image);
+                const thisSubPackageImagePath = 'images/' + path.join(subpackage, image);
                 if(imageManifest[image]!==thisSubPackageImagePath){
                     imageManifest[image] = image;
                 }

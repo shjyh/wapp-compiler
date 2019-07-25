@@ -49,7 +49,7 @@ export default class PugCompiler implements Compiler{
 
             this.xmlGenFn = runtimeWrapper(generateCode(ast));
         }catch(e){
-            this.error = e;
+             this.error = new Error('Error: /<srcDir>/' + this.path + ':\n' + e.message);
         }
     }
 

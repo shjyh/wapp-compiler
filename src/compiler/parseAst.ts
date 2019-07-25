@@ -128,7 +128,7 @@ function parseImage(imageTag: AstTag, result: AstParseResult){
     let val = unWrapperAttrVal(attr.val);
     if(!val.startsWith('@image/')) return;
     const imageName = val.substr(7);
-    attr.val = `images["${imageName}"]`;
+    attr.val = `'/'+images["${imageName}"]`;
     if(!result.images.includes(imageName)){
         result.images.push(imageName);
     }
