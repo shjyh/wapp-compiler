@@ -86,7 +86,7 @@ export default class SFCCompiler implements Compiler{
             let genCode = [];
             if(this.wrapperPath){
                 genCode.push(`require('${rootRelativePath}/${this.wrapperPath}').`);
-                genCode.push(this.isPage?'Page':'Component');
+                genCode.push(this.isPage?'wp':'wc');
             }else{
                 genCode.push(`require('${libRelativePath}').`);
                 genCode.push(this.isPage?'p(Page)':'c(Component)');
