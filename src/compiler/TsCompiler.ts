@@ -33,7 +33,9 @@ export default class TsCompiler implements Compiler{
             if(this.env){
                 this.content = conditionParse(this.content, this.env);
             }
-            if(!this.useRaw){
+            if(this.useRaw){
+                this.transformCode = this.content;
+            }else{
                 const options =  getBabelConfig('/<srcDir>/' + this.path);
                 if(this.compress){
                     options.sourceMaps = false;
