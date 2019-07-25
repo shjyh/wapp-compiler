@@ -62,7 +62,7 @@ export default class SFCCompiler implements Compiler{
             if(scriptMatch&&scriptMatch[2]){
                 this.raw = scriptMatch[1] === 'raw';
                 this.tsCompiler = new TsCompiler(
-                    basePath + (this.raw?'':'.factory') +'.js', scriptMatch[2], this.npmModules, this.compress, this.env
+                    basePath + (this.raw?'':'.factory') +'.ts', scriptMatch[2], this.npmModules, this.compress, this.env
                 )
             };
         }catch(e){
