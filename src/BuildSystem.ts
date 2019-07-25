@@ -131,7 +131,9 @@ export class BuildSystem {
         switch(extname){
             case '.ts': case '.js': case '.wxs':
                 this.tsCompilers.push(new TsCompiler(
-                    srcRelativePath,  readFileAsString(f), this.npmModules, this.compress, this.env,
+                    srcRelativePath,  readFileAsString(f), this.npmModules, 
+                    srcRelativePath.endsWith('.min.js') ? false : this.compress, 
+                    this.env,
                     // functional-pages文件夹下文件和.wxs文件不要转译
                     srcRelativePath.includes('functional-pages/')||extname==='.wxs'||srcRelativePath.endsWith('.min.js')
                 ));
