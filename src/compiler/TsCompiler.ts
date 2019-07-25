@@ -31,7 +31,11 @@ export default class TsCompiler implements Compiler{
         this.error = null;
         try{
             if(this.env){
-                this.content = conditionParse(this.content, this.env);
+                try{
+                    this.content = conditionParse(this.content, this.env);
+                }catch(e){
+                    throw new Error('Error: /<srcDir>/' + this.path + ':\n' + e.message);
+                }
             }
             if(this.useRaw){
                 this.transformCode = this.content;

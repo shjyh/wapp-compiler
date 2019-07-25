@@ -12,7 +12,7 @@ console.log(a, b, c, root);
 
 test('ts-compiler 功能测试', ()=>{
     const npmList = [];
-    const compiler = new TsCompiler('dir/inner/test.ts', code, npmList, false);
+    const compiler = new TsCompiler('dir/inner/test.ts', code, npmList, false, {});
 
     //console.logg(compiler.getResult()['dir/inner/test.ts']);
 

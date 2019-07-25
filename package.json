@@ -47,6 +47,7 @@
         "mustache": "^3.0.1",
         "ora": "^3.4.0",
         "postcss": "^7.0.17",
+        "pretty-error": "^2.1.1",
         "pug": "^2.0.4",
         "pug-code-gen": "^2.0.2",
         "pug-lexer": "^4.1.0",

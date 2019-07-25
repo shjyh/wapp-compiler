@@ -16,6 +16,9 @@ import chalk from 'chalk';
 import ora from 'ora';
 import webpack from 'webpack';
 import TerserPlugin from 'terser-webpack-plugin';
+import PrettyError from 'pretty-error';
+
+const pe = new PrettyError();
 
 import debounce from 'lodash/debounce';
 
@@ -326,7 +329,7 @@ export class BuildSystem {
             }).map(c=>(c as SvgCompiler).ready)
         ).then(()=>{
             if(this.appJsonCompiler&&this.appJsonCompiler.getLastError()){
-                console.error(this.appJsonCompiler.getLastError());
+                console.log(pe.render(this.appJsonCompiler.getLastError()))
                 return;
             }
             for(let c of [
@@ -338,7 +341,7 @@ export class BuildSystem {
                 ...this.resourceCompilers
             ]){
                 if(c.getLastError()){
-                    console.error(c.getLastError());
+                    console.log(pe.render(c.getLastError()))
                     return;
                 }
             }
@@ -348,10 +351,11 @@ export class BuildSystem {
             
             //生成app.json
             if(this.appJsonCompiler){
+                const appJson = this.appJsonCompiler.getJsonObj();
                 this.pages.forEach(p=>this.insertPageIntoAppJson(
-                    this.appJsonCompiler.getJsonObj(), p
+                    appJson, p
                 ));
-                files['app.json'] = JSON.stringify(this.appJsonCompiler.getJsonObj());
+                files['app.json'] = JSON.stringify(appJson);
             }
 
             for(let c of [...this.tsCompilers, ...this.sassCompilers, ...this.jsonCompilers]){
@@ -367,7 +371,7 @@ export class BuildSystem {
             });
             this.fileSystem.setFiles(files);
         }).catch(e=>{
-            console.error(e);
+            console.log(pe.render(e));
         });
     }
     private insertPageIntoAppJson(appJson, page: string){

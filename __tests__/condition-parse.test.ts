@@ -1,5 +1,5 @@
 import conditionParse from '../src/conditionParse';
-
+require
 const code = `
 /// #if DEBUG
 output if DEBUG

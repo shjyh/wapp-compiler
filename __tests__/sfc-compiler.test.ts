@@ -28,7 +28,7 @@ export default {
     `
 
     const npmList = [];
-    const compiler = new SFCCompiler(__dirname, 'a/b/c.vue', code, npmList, false);
+    const compiler = new SFCCompiler(__dirname, 'a/b/c.vue', code, npmList, false, {}, null);
 
     const result = compiler.getResult({});
     expect(result['a/b/c.js']).toBe(`require('../../lib').p(require('./c.factory.js'),["title.name"],["see"])`);
