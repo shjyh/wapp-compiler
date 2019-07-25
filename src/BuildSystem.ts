@@ -355,6 +355,7 @@ export class BuildSystem {
                 this.pages.forEach(p=>this.insertPageIntoAppJson(
                     appJson, p
                 ));
+                delete appJson.main;
                 files['app.json'] = JSON.stringify(appJson);
             }
 
