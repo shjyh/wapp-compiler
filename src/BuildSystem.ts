@@ -82,7 +82,8 @@ export class BuildSystem {
         private src: string, private dist: string, 
         private compress: boolean,
         private env: {[key: string]: boolean|string},
-        private watch: boolean
+        private watch: boolean,
+        private page: string
     ){
         this.fileSystem = new FileCache(this.dist);
 
@@ -152,7 +153,7 @@ export class BuildSystem {
             case '.vue':
                 {
                     const compiler = new SFCCompiler(
-                        this.src, srcRelativePath, readFileAsString(f), this.npmModules, this.compress, this.env
+                        this.src, srcRelativePath, readFileAsString(f), this.npmModules, this.compress, this.env, this.page
                     );
                     if(compiler.isPage) this.pages.push(unwrapext(srcRelativePath));
                     this.sfcCompilers.push(compiler);

@@ -12,7 +12,7 @@ export default class SFCCompiler implements Compiler{
     private pugCompiler: PugCompiler = null;
     private jsonCompiler: JSONCompiler = null;
 
-    private _isPage: boolean = null;
+    private _isPage: boolean = true;
     get isPage(){ return this._isPage; }
 
     private raw: boolean = false; //使用原始的Page
@@ -24,7 +24,8 @@ export default class SFCCompiler implements Compiler{
         private content: string, 
         private npmModules: string[],
         private compress: boolean,
-        private env: {[key: string]: boolean|string}
+        private env: {[key: string]: boolean|string},
+        private page: string
     ){
         this.compile();
     }
@@ -46,6 +47,8 @@ export default class SFCCompiler implements Compiler{
             const configMatch = this.content.match(/<config[\s\S]*?>([\s\S]*?)<\/config>/);
             if(configMatch&&configMatch[1]&&configMatch[1].trim()){
                 this.jsonCompiler = new JSONCompiler(basePath + '.json', configMatch[1]);
+
+                if(!this.jsonCompiler.getLastError()&&this.jsonCompiler.getJsonObj().component) this._isPage = false;
             }
 
             const wxssMatch = this.content.match(/<style[\s\S]*?>([\s\S]*?)<\/style>/);
@@ -80,8 +83,18 @@ export default class SFCCompiler implements Compiler{
             const watchItems = this.pugCompiler?this.pugCompiler.getWatchItems():[];
             const methods = this.pugCompiler?this.pugCompiler.getMethods():[]
 
-            result[basePath + '.js'] = `require('${libRelativePath}').${this.isPage?'p':'c'}(require('./${parsedPath.name}.factory.js'),${
-                JSON.stringify(watchItems)},${JSON.stringify(methods)})`;
+            let genCode = [`require('${libRelativePath}').${this.isPage?'p':'c'}(`]
+            if(this.isPage){
+                if(this.page){
+                    genCode.push(`require('${rootRelativePath}/${this.page}').Page)`)
+                }else{
+                    genCode.push('Page)');
+                }
+            }else{
+                genCode.push('Component)')
+            }
+            genCode.push(`(require('./${parsedPath.name}.factory.js'),${JSON.stringify(watchItems)},${JSON.stringify(methods)})`);
+            result[basePath + '.js'] = genCode.join('');
         }
 
         if(this.jsonCompiler) Object.assign(result, this.jsonCompiler.getResult());
