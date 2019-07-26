@@ -4,3 +4,4 @@
 node_modules
 /dist
 /demo_dist
+/demo/.tmp
