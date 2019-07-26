@@ -68,6 +68,7 @@ export default function parse(express: string): string[]{
             lastName = lastName.substr(0, index);
             if(!lastName) return;
         }
+        if(lastName==='true'||lastName==='false') return;
         if(!vars.includes(lastName)){
             vars.push(lastName);
         }
