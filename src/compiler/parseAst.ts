@@ -5,7 +5,7 @@ import { kMaxLength } from 'buffer';
 
 export interface AstAttr {
     name: string;
-    val: string
+    val: string|boolean
 }
 
 export interface AstNode {
@@ -67,6 +67,7 @@ function parseAstTag(astTag: AstTag, result: AstParseResult, forBlocks: WxForBlo
     let wxForKey = undefined;
 
     for(let attr of astTag.attrs||[]){
+        if(typeof attr.val !== 'string') continue;
         const val = unWrapperAttrVal(attr.val);
         switch(attr.name){
             case 'wx:for-item':
@@ -125,6 +126,7 @@ function parseAstText(astText: AstText, result: AstParseResult, forBlocks: WxFor
 function parseImage(imageTag: AstTag, result: AstParseResult){
     const attr = imageTag.attrs.find(attr=>attr.name==='src');
     if(!attr) return;
+    if(typeof attr.val !== 'string') return;
     let val = unWrapperAttrVal(attr.val);
     if(!val.startsWith('@image/')) return;
     const imageName = val.substr(7);
