@@ -61,7 +61,7 @@ export default class SFCCompiler implements Compiler{
                 this.pugCompiler = new PugCompiler(this.src, basePath + '.wxml', wxmlMatch[1]);
             }
 
-            const scriptMatch = this.content.match(/<script[\s\S]*\s?(raw)?\s?>([\s\S]*?)<\/script>/);
+            const scriptMatch = this.content.match(/<script[\s\S]*?(raw)?\s?>([\s\S]*?)<\/script>/);
             if(scriptMatch&&scriptMatch[2]){
                 this.raw = scriptMatch[1] === 'raw';
                 this.tsCompiler = new TsCompiler(
@@ -118,7 +118,7 @@ export default class SFCCompiler implements Compiler{
     getLastError(): Error {
         if(this.error) return this.error;
         for(let compiler of [this.jsonCompiler, this.sassCompiler, this.pugCompiler, this.tsCompiler]){
-            if(compiler&&compiler.getLastError) return compiler.getLastError();
+            if(compiler&&compiler.getLastError()) return compiler.getLastError();
         }
         return null;
     }
