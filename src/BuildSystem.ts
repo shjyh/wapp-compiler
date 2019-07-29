@@ -254,14 +254,15 @@ export class BuildSystem {
     startWebpack(){
         let preHash = '';
         const completeCallback: webpack.ICompiler.Handler = (err, stats) => {
+            if(err){
+                console.log(pe.render(err));
+                return;
+            }
+
             if(stats.compilation.modules.length<=1) return;
             if(stats.hash === preHash) return;
             preHash = stats.hash;
-            if(err){
-                console.warn(err);
-            }else{
-                this.log('npm包构建完成 ' + chalk.yellow('hash: ' + stats.hash));
-            }
+            this.log('npm包构建完成 ' + chalk.yellow('hash: ' + stats.hash));
         }
         const compiler = webpack({
             entry: {
