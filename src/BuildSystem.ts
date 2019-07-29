@@ -95,7 +95,9 @@ export class BuildSystem {
         fs.mkdirSync(path.dirname(this.npmlibjs), { recursive: true });
         fs.writeFileSync(this.npmlibjs, '');
 
-        this.startWebpack();
+        if(this.watch){
+            this.startWebpack();
+        }
 
         this.log('正在扫描工程文件...', 'warn');
         this.spinner = ora();
@@ -366,10 +368,15 @@ export class BuildSystem {
                 Object.assign(files, c.getResult(imageManifest));
             }
             
+            if(this.watch){
+                fs.writeFile(this.npmlibjs, this.getLibCode(), err=>{
+                    if(err) console.log(err);
+                });
+            }else{
+                fs.writeFileSync(this.npmlibjs, this.getLibCode);
+                this.startWebpack();
+            }
             this.log('写入文件', 'warn');
-            fs.writeFile(this.npmlibjs, this.getLibCode(), err=>{
-                if(err) console.log(err);
-            });
             this.fileSystem.setFiles(files);
         }).catch(e=>{
             console.log(pe.render(e));
