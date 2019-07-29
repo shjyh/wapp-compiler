@@ -93,9 +93,9 @@ export class BuildSystem {
         //.tmp/lib.js文件，用于webpack
         this.npmlibjs = path.join(this.src, '.tmp/lib.js');
         fs.mkdirSync(path.dirname(this.npmlibjs), { recursive: true });
-        fs.writeFileSync(this.npmlibjs, '');
 
         if(this.watch){
+            fs.writeFileSync(this.npmlibjs, '');
             this.startWebpack();
         }
 
@@ -373,7 +373,7 @@ export class BuildSystem {
                     if(err) console.log(err);
                 });
             }else{
-                fs.writeFileSync(this.npmlibjs, this.getLibCode);
+                fs.writeFileSync(this.npmlibjs, this.getLibCode());
                 this.startWebpack();
             }
             this.log('写入文件', 'warn');
