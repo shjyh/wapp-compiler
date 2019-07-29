@@ -42,7 +42,6 @@ export default class SFCCompiler implements Compiler{
         this.jsonCompiler = this.sassCompiler = this.pugCompiler = this.tsCompiler = null;
         try{
             const basePath = path.join(path.dirname(this.path), path.basename(this.path, path.extname(this.path)));
-            this._isPage = basePath.endsWith('.page');
 
             const configMatch = this.content.match(/<config[\s\S]*?>([\s\S]*?)<\/config>/);
             if(configMatch&&configMatch[1]&&configMatch[1].trim()){
@@ -80,8 +79,12 @@ export default class SFCCompiler implements Compiler{
             const libRelativePath = rootRelativePath + '/lib';
             const parsedPath: path.ParsedPath = path.parse(this.path);
             const basePath = path.join(path.dirname(this.path), path.basename(this.path, parsedPath.ext));
-            const watchItems = this.pugCompiler?this.pugCompiler.getWatchItems():[];
-            const methods = this.pugCompiler?this.pugCompiler.getMethods():[]
+            const watchItems = (this.pugCompiler?this.pugCompiler.getWatchItems():[]).filter(w=>w!=='$images');
+            const methods = this.pugCompiler?this.pugCompiler.getMethods():[];
+            const vImageMap: {[key: string]: string} = {};
+            (this.pugCompiler?this.pugCompiler.getVImages():[]).forEach(s=>{
+                vImageMap[s] = imageMap[s];
+            })
 
             let genCode = [];
             if(this.wrapperPath){
@@ -91,7 +94,9 @@ export default class SFCCompiler implements Compiler{
                 genCode.push(`require('${libRelativePath}').`);
                 genCode.push(this.isPage?'p(Page)':'c(Component)');
             }
-            genCode.push(`(require('./${parsedPath.name}.factory.js').default,${JSON.stringify(watchItems)},${JSON.stringify(methods)});`);
+            genCode.push(`(require('./${parsedPath.name}.factory.js').default,${JSON.stringify(watchItems)},${JSON.stringify(methods)}${
+                Object.keys(vImageMap).length?`,${JSON.stringify(vImageMap)}`:''
+            });`);
             result[basePath + '.js'] = genCode.join('');
         }
 

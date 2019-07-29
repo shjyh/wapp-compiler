@@ -19,6 +19,7 @@ export default class PugCompiler implements Compiler{
     private watchItems: WatchItem[] = [];
     private methods: string[] = [];
     private images: string[] = [];
+    private vImages: string[] = [];
     
     constructor(
         private src: string,
@@ -58,6 +59,7 @@ export default class PugCompiler implements Compiler{
         this.watchItems = result.watchItems;
         this.images = result.images;
         this.methods = result.methods;
+        this.vImages = result.vImages;
     }
 
     getMethods(){
@@ -69,6 +71,9 @@ export default class PugCompiler implements Compiler{
     }
     getImages(){
         return this.images;
+    }
+    getVImages(){
+        return this.vImages;
     }
 
     matchSubpackage(subpackages: string[]): string {

@@ -19,6 +19,7 @@ block content
 test('pug 解析', ()=>{
     const compiler = new PugCompiler(__dirname, 'test.wxml', pugCode);
     expect(compiler.getImages()).toEqual(['aa', 'bb']);
+    expect(compiler.getVImages()).toEqual(['aa']);
     expect(compiler.getMethods()).toEqual(['$$trigger$$pagetap']);
     expect(compiler.getWatchItems()).toEqual([
         '$$minHeight$$', 'content.b', 'names.length', 'names[0]',

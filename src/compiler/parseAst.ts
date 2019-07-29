@@ -32,7 +32,8 @@ export interface AstText extends AstNode {
 export interface AstParseResult {
     methods: string[],
     watchItems: WatchItem[],
-    images: string[]
+    images: string[],
+    vImages: string[]
 }
 
 interface WxForBlock {
@@ -130,6 +131,12 @@ function parseImage(imageTag: AstTag, result: AstParseResult){
     let val = unWrapperAttrVal(attr.val);
     if(!val.startsWith('@image/')) return;
     const imageName = val.substr(7);
+    if(imageTag.name==='v-image'){
+        if(!result.vImages.includes(imageName)){
+            result.vImages.push(imageName);
+        }
+    }
+
     attr.val = `'/'+images["${imageName}"]`;
     if(!result.images.includes(imageName)){
         result.images.push(imageName);
@@ -280,7 +287,8 @@ export default function parseAst(ast: AstBlock): AstParseResult{
     const result: AstParseResult = {
         watchItems: [],
         methods: [],
-        images: []
+        images: [],
+        vImages: []
     };
     parseAstNodes(ast.nodes||[], result, []);
     return result;
