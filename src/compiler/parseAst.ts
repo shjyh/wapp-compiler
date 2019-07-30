@@ -1,7 +1,6 @@
 import WatchItem, { ArrayWatchItem, NestedArrayWatchItem } from './WatchItem';
 import mustache from 'mustache';
 import parseVarible from './parseVarible';
-import { kMaxLength } from 'buffer';
 
 export interface AstAttr {
     name: string;
@@ -175,7 +174,6 @@ function getArrayWatchItem(path, key): ArrayWatchItem{
 
 function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars: string[], key: string, forBlocks: WxForBlock[]){
     for(let v of vars){
-        if(v.endsWith('.length')) continue;
         let resolved = false;
         for(let forBlock of forBlocks){
             if(v===forBlock.indexName||unWrapperedScope(v, forBlock.indexName)){
@@ -196,37 +194,47 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
 
             forBlock.watches.forEach(watch => {
                 if(Array.isArray(watch.watches)){
-                    thisForBlock.watches.push(combineArrayWatchItems(watch.watches, getArrayWatchItem(path, key)));
+                    const w = combineArrayWatchItems(watch.watches, getArrayWatchItem(path, key));
+                    if(w) thisForBlock.watches.push(w);
                 }
             })
             resolved = true;
         }
 
         if(!resolved){
-            thisForBlock.watches.push(combineArrayWatchItems(result.watchItems, getArrayWatchItem(v, key)));
+            const w = combineArrayWatchItems(result.watchItems, getArrayWatchItem(v, key));
+            if(w) thisForBlock.watches.push(w);
         }
     }
     forBlocks.unshift(thisForBlock);
 }
 
-function combineArrayWatchItems(watches: WatchItem[], arrayWatch: ArrayWatchItem): ArrayWatchItem{
-    if(watches.includes(arrayWatch.path)){
-        watches.splice(watches.indexOf(arrayWatch.path), 1);
-    }
-    const alreadyInclude = watches.find(w=>{
-        if(typeof w === 'string') return false;
-        return w.path === arrayWatch.path;
+function combineArrayWatchItems(watches: WatchItem[], arrayWatch: ArrayWatchItem): ArrayWatchItem|false{
+
+    const filterWatches = watches.filter(w=>{
+        const path = typeof w === 'string' ? w : w.path;
+        return !path.startsWith(arrayWatch.path + '.')&&!path.startsWith(arrayWatch.path + '[');
     });
-    if(alreadyInclude) return alreadyInclude as ArrayWatchItem;
-    else{
+    watches.length = 0;
+    watches.push(...filterWatches);
+
+    const alreadyInclude = watches.find(w=>{
+        const path = typeof w === 'string' ? w : w.path;
+        return arrayWatch.path.startsWith(path + '.')||arrayWatch.path.startsWith(path + '[')||arrayWatch.path === path;
+    });
+    
+    if(!alreadyInclude){
         watches.push(arrayWatch);
         return arrayWatch;
     }
+
+    if(typeof alreadyInclude === 'string') return false;
+    if(alreadyInclude.path!==arrayWatch.path) return false;
+    return alreadyInclude;
 }
 
 function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars: string[]){
     for(let v of vars){
-        if(v.endsWith('.length')) continue;
         let resolved = false;
         for(let forBlock of forBlocks){
             if(v===forBlock.indexName||unWrapperedScope(v, forBlock.indexName)){
@@ -247,24 +255,29 @@ function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars:
                 if(!watch.watches) return;
                 if(!Array.isArray(watch.watches)) return;
 
-                if(!watch.watches.find(w=>{
-                    if(w===path||(w as ArrayWatchItem).path===path) return true;
-                    return false;
-                })){
-                    watch.watches.push(path);
-                }
+                insertWatchStringItem(watch.watches, path);
             })
             resolved = true;
         }
 
         if(!resolved){
-            if(!result.watchItems.find(w=>{
-                if(w===v||(w as ArrayWatchItem).path===v) return true;
-                return false;
-            })){
-                result.watchItems.push(v);
-            }
+            insertWatchStringItem(result.watchItems, v);
         }
+    }
+}
+
+function insertWatchStringItem(watches: WatchItem[], watchItem: string){
+    const filterWatches = watches.filter(w=>{
+        const path = typeof w === 'string' ? w : w.path;
+        return !path.startsWith(watchItem + '.')&&!path.startsWith(watchItem + '[');
+    });
+    watches.length = 0;
+    watches.push(...filterWatches);
+    if(!watches.find(w=>{
+        const path = typeof w==='string' ? w : w.path;
+        return watchItem.startsWith(path + '.')||watchItem.startsWith(path + '[')||watchItem === path;
+    })){
+        watches.push(watchItem);
     }
 }
 

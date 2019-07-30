@@ -7,6 +7,7 @@ block content
     v-image(src="@image/aa")
     image(src="@image/bb")
     div(data-a="a") {{content.b}}
+    div {{names}}
     div(data-b=b) {{names.length>0?names[0]:0}}
     span {{content.b}}
     view(wx:for="{{arr}}" wx:for-item="itemName" wx:for-index="idx" wx:key="id")
@@ -22,7 +23,7 @@ test('pug 解析', ()=>{
     expect(compiler.getVImages()).toEqual(['aa']);
     expect(compiler.getMethods()).toEqual(['$$trigger$$pagetap']);
     expect(compiler.getWatchItems()).toEqual([
-        '$$minHeight$$', 'content.b', 'names.length', 'names[0]',
+        '$$minHeight$$', 'content.b', 'names',
         { 
             path: 'arr', 
             watches: [
