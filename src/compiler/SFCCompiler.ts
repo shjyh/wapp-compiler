@@ -40,6 +40,7 @@ export default class SFCCompiler implements Compiler{
     private compile(){
         this.error = null;
         this.jsonCompiler = this.sassCompiler = this.pugCompiler = this.tsCompiler = null;
+        this._isPage = true;
         try{
             const basePath = path.join(path.dirname(this.path), path.basename(this.path, path.extname(this.path)));
 

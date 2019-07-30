@@ -35,6 +35,9 @@ function arrayRemove(arr: any[], item: any){
         arr.splice(index, 1);
     }
 }
+function arrayAdd(arr: any[], item: any){
+    if(arr.indexOf(item)===-1) arr.push(item);
+}
 
 function removeCompiler<D extends string|Buffer, T extends Compiler<D>>(compilers: T[], p: string, cb?: (c: T)=>void){
     const compilerIndex = compilers.findIndex(c=>c.is(p))
@@ -44,10 +47,11 @@ function removeCompiler<D extends string|Buffer, T extends Compiler<D>>(compiler
     }
 }
 
-function setCompilerContent<D extends string|Buffer, T extends Compiler<D>>(compilers: T[], p: string, content: D){
+function setCompilerContent<D extends string|Buffer, T extends Compiler<D>>(compilers: T[], p: string, content: D, cb?: (c: T)=>void){
     const compiler = compilers.find(c=>c.is(p));
     if(!compiler) return;
     compiler.setContent(content);
+    if(cb) cb(compiler);
 }
 
 function unwrapext(p: string){
@@ -198,7 +202,7 @@ export class BuildSystem {
                 break;
             case '.vue':
                 removeCompiler(this.sfcCompilers, srcRelativePath, c=>{
-                    if(c.isPage) arrayRemove(this.pages, unwrapext(srcRelativePath));
+                    arrayRemove(this.pages, unwrapext(srcRelativePath));
                 });
                 break;
             case '.json':
@@ -228,7 +232,11 @@ export class BuildSystem {
                 setCompilerContent(this.sassCompilers, srcRelativePath, readFileAsString(f));
                 break;
             case '.vue':
-                setCompilerContent(this.sfcCompilers, srcRelativePath, readFileAsString(f));
+                setCompilerContent(this.sfcCompilers, srcRelativePath, readFileAsString(f), c=>{
+                    const pagePath = unwrapext(srcRelativePath);
+                    if(c.isPage) arrayAdd(this.pages, pagePath);
+                    else arrayRemove(this.pages, pagePath);
+                });
                 break;
             case '.json':
                 if(srcRelativePath === 'app.json') this.appJsonCompiler.setContent(readFileAsString(f));
