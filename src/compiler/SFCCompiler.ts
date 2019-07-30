@@ -83,7 +83,7 @@ export default class SFCCompiler implements Compiler{
             const methods = this.pugCompiler?this.pugCompiler.getMethods():[];
             const vImageMap: {[key: string]: string} = {};
             (this.pugCompiler?this.pugCompiler.getVImages():[]).forEach(s=>{
-                vImageMap[s] = imageMap[s];
+                vImageMap[s] = '/' + imageMap[s];
             })
 
             let genCode = [];

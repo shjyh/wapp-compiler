@@ -32,7 +32,7 @@ export default {
     const npmList = [];
     const compiler = new SFCCompiler(__dirname, 'a/b/c.vue', code, npmList, false, {}, null);
 
-    const result = compiler.getResult({"aa.svg": "/images/aa.svg"});
+    const result = compiler.getResult({"aa.svg": "images/aa.svg"});
     expect(result['a/b/c.js']).toBe(`require('../../lib').p(Page)(require('./c.factory.js').default,["title.name","aa"],["see"],{"aa.svg":"/images/aa.svg"});`);
     expect(result['a/b/c.factory.js']).toBeTruthy();
     expect(result['a/b/c.wxml']).toBeTruthy();

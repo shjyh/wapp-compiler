@@ -19,15 +19,15 @@ test('ts-compiler 功能测试', ()=>{
     expect(npmList).toEqual(['@babel/runtime-corejs3/helpers/interopRequireDefault', 'a/b']);
     expect(compiler.getLastError()).toBe(null);
     expect(compiler.getResult()).toEqual({
-        'dir/inner/test.ts': expect.stringContaining('require("../../root-module")')
+        'dir/inner/test.js': expect.stringContaining('require("../../root-module")')
     });
     expect(compiler.getResult()).toEqual({
-        'dir/inner/test.ts': expect.stringContaining('require("../../run")')
+        'dir/inner/test.js': expect.stringContaining('require("../../run")')
     });
     expect(compiler.getResult()).toEqual({
-        'dir/inner/test.ts': expect.stringContaining('_$lib$_.n[1]')
+        'dir/inner/test.js': expect.stringContaining('_$lib$_.n[1]')
     });
     expect(compiler.getResult()).toEqual({
-        'dir/inner/test.ts': expect.stringContaining('require("../../lib")')
+        'dir/inner/test.js': expect.stringContaining('require("../../lib")')
     });
 })

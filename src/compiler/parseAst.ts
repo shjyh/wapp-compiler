@@ -175,6 +175,7 @@ function getArrayWatchItem(path, key): ArrayWatchItem{
 
 function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars: string[], key: string, forBlocks: WxForBlock[]){
     for(let v of vars){
+        if(v.endsWith('.length')) continue;
         let resolved = false;
         for(let forBlock of forBlocks){
             if(v===forBlock.indexName||unWrapperedScope(v, forBlock.indexName)){
@@ -225,6 +226,7 @@ function combineArrayWatchItems(watches: WatchItem[], arrayWatch: ArrayWatchItem
 
 function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars: string[]){
     for(let v of vars){
+        if(v.endsWith('.length')) continue;
         let resolved = false;
         for(let forBlock of forBlocks){
             if(v===forBlock.indexName||unWrapperedScope(v, forBlock.indexName)){
