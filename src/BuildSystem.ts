@@ -398,7 +398,7 @@ export class BuildSystem {
                 if(!subPackage.pages) subPackage.pages = [];
                 if(page.startsWith(subPackage.root)){
                     subPackage.pages.push(path.relative(subPackage.root, page));
-                    continue;
+                    return;
                 }
             }
         }
