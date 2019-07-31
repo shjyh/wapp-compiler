@@ -190,7 +190,7 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
                 break;
             }
             const path = unWrapperedScope(v, forBlock.itemName);
-            if(!path) break;
+            if(!path) continue;
 
             forBlock.watches.forEach(watch => {
                 if(Array.isArray(watch.watches)){
@@ -249,7 +249,7 @@ function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars:
                 break;
             }
             const path = unWrapperedScope(v, forBlock.itemName);
-            if(!path) break;
+            if(!path) continue;
 
             forBlock.watches.forEach(watch => {
                 if(!watch.watches) return;

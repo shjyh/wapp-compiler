@@ -17,6 +17,15 @@ block content
             view {{item.value}}
 `;
 
+const otherPugCode = `
+m-title(title="行程亮点" watermark="HIGHLIGHT")
+block(wx:for="{{contentList}}" wx:key="$random" wx:for-item="node")
+    block(wx:if="{{node.type==='text'}}"): block(wx:for="{{node.para}}" wx:key="$random")
+        view.text(style="color:{{node.color}}" class="{{node.align}}")
+            image.star(src="@image/jr/star.svg") 
+            | {{item.c}} {{node.color}}
+`
+
 test('pug 解析', ()=>{
     const compiler = new PugCompiler(__dirname, 'test.wxml', pugCode);
     expect(compiler.getImages()).toEqual(['aa', 'bb']);
@@ -46,4 +55,21 @@ test('pug 解析', ()=>{
     expect(compiler.getResult({aa:'xxxxxxaa.svg', 'bb': 'xxxxxxxbb.svg'})).toEqual({
         'test.wxml': expect.stringContaining('xxxxxxxbb.svg')
     });
+
+    const otherCompiler = new PugCompiler(__dirname, 'other.wxml', otherPugCode);
+    expect(otherCompiler.getWatchItems()).toEqual([
+        {
+            path: "contentList",
+            watches: [
+                "$random","type", 
+                { 
+                    path: "para",
+                    watches: [ "$random","c" ],
+                    key: "$random"
+                },
+                "color", "align"
+            ],
+            key: "$random"
+        }
+    ])
 });
