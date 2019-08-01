@@ -1,6 +1,9 @@
 import jsTokens, { matchToToken } from 'js-tokens';
 
 export default function parse(express: string): string[]{
+    express = express.trim();
+    if(!express) return [];
+    
     const vars = [];
     jsTokens.lastIndex = 0;
     let match = null;
