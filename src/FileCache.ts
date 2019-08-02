@@ -1,86 +1,53 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export default class FileCache{
-    private filePaths: string[] = [];
-    private fileContentMap: {[key: string]: string|Buffer} = {};
-    private changedKeys: string[] = [];
+export default class FileCache {
+    private files: {[key: string]: string|Buffer} = {};
 
     constructor(private dist: string){}
 
-    private setFile(p: string, content: string|Buffer){
-        //已更改文件中存在，直接替换内容
-        if(this.changedKeys.includes(p)){
-            this.fileContentMap[p] = content;
-            return;
+    private isEqual(newContent: string|Buffer, oldContent: string|Buffer){
+        if(typeof newContent !== typeof oldContent) return false;
+        if(!Buffer.isBuffer(newContent)){
+            return newContent === oldContent;
         }
-
-        //新文件加入
-        if(!this.filePaths.includes(p)){
-            this.filePaths.push(p);
-            this.fileContentMap[p] = content;
-            this.changedKeys.push(p);
-            this.runCallback();
-            return;
-        }
-
-
-        //比对新旧内容，更新已更改文件列表
-        const alreadyContent = this.fileContentMap[p];
-        let isChanged = false;
-        if(typeof content === 'string'){
-            if(content!==alreadyContent) isChanged = true;
-        }else if(typeof alreadyContent === 'string'){
-            isChanged = true;
-        }else if( (content!==alreadyContent) && content.compare(alreadyContent)!==0){
-            isChanged = true;
-        }
-
-        if(!isChanged) return;
-        this.fileContentMap[p] = content;
-        this.changedKeys.push(p);
-        this.runCallback();
-    }
-
-    setFiles(files: {[key: string]: string|Buffer}){
-        const setKeys = Object.keys(files);
-        const removedFileKeys = this.filePaths.filter(f=>!setKeys.includes(f));
         
-        for(let sk of setKeys){
-            this.setFile(sk, files[sk]);
+        return newContent.compare(oldContent as Buffer)===0;
+    }
+    setFiles(files: {[key: string]: string|Buffer}){
+        const oldKeys = Object.keys(this.files);
+        const newKeys = Object.keys(files);
+
+        const removedKeys = oldKeys.filter(f=>!newKeys.includes(f));
+        const changedKeys: string[] = [];
+
+        for(let key of newKeys){
+            if(!this.files[key]) changedKeys.push(key);
+            else if(!this.isEqual(files[key], this.files[key])) changedKeys.push(key);
         }
-        for(let rk of removedFileKeys){
-            this.setFile(rk, null);
-        }
+
+        this.files = files;
+        this.write(changedKeys, removedKeys);
     }
 
-    private getFile(p: string): string|Buffer{
-        return this.fileContentMap[p];
-    }
-
-    private hasTickSchedular = false;
-    private runCallback(){
-        if(this.hasTickSchedular) return;
-        this.hasTickSchedular = true;
-
-        process.nextTick(()=>{
-            this.hasTickSchedular = false;
-            
-            for(let key of this.changedKeys){
-                const realFilePath = path.resolve(this.dist, key);
-                fs.promises.mkdir(path.dirname(realFilePath), {recursive: true}).then(r=>{
-                    const fileContent = this.getFile(key);
-                    if(fileContent===null){
-                        return fs.promises.unlink(realFilePath);
-                    }else{
-                        return fs.promises.writeFile(realFilePath, fileContent, {encoding: 'UTF8'});
-                    }
-                }).catch(e=>{
-                    console.error(e);
-                    return Promise.reject(e);
-                })
-            }
-            this.changedKeys = [];
-        })
+    private write(changedKeys: string[], removedKeys: string[]){
+        for(let key of changedKeys){
+            const realFilePath = path.resolve(this.dist, key);
+            fs.promises.mkdir(path.dirname(realFilePath), {recursive: true}).then(r=>{
+                return fs.promises.writeFile(realFilePath, this.files[key], {encoding: 'UTF8'})
+            }).catch(e=>{
+                console.error(e);
+                return Promise.reject(e);
+            })
+        }
+        for(let key of removedKeys){
+            const realFilePath = path.resolve(this.dist, key);
+            fs.promises.mkdir(path.dirname(realFilePath), {recursive: true}).then(r=>{
+                return fs.promises.unlink(realFilePath);
+            }).catch(e=>{
+                console.error(e);
+                return Promise.reject(e);
+            })
+        }
     }
 }
