@@ -396,7 +396,7 @@ export class BuildSystem {
         if(appJson.subPackages){
             for(let subPackage of appJson.subPackages){
                 if(!subPackage.pages) subPackage.pages = [];
-                if(page.startsWith(subPackage.root)){
+                if(page.startsWith(subPackage.root + '/')){
                     subPackage.pages.push(path.relative(subPackage.root, page));
                     return;
                 }
