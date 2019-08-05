@@ -19,6 +19,9 @@ block content
 
 const otherPugCode = `
 m-title(title="行程亮点" watermark="HIGHLIGHT")
+view(wx:if="{{!basic}}")
+view(wx:else)
+    view {{basic.name}}
 block(wx:for="{{contentList}}" wx:key="$random" wx:for-item="node")
     block(wx:if="{{node.type==='text'}}"): block(wx:for="{{node.para}}" wx:key="$random")
         view.text(style="color:{{node.color}}" class="{{node.align}}")
@@ -27,6 +30,7 @@ block(wx:for="{{contentList}}" wx:key="$random" wx:for-item="node")
 `
 
 test('pug 解析', ()=>{
+
     const compiler = new PugCompiler(__dirname, 'test.wxml', pugCode);
     expect(compiler.getImages()).toEqual(['aa', 'bb']);
     expect(compiler.getVImages()).toEqual(['aa']);
@@ -58,6 +62,7 @@ test('pug 解析', ()=>{
 
     const otherCompiler = new PugCompiler(__dirname, 'other.wxml', otherPugCode);
     expect(otherCompiler.getWatchItems()).toEqual([
+        "basic",
         {
             path: "contentList",
             watches: [

@@ -1279,7 +1279,7 @@
 
 "@zouke/wapp-lib@git+ssh://git@code.aliyun.com:zouke-npm/wapp-lib.git#current":
   version "1.0.0"
-  resolved "git+ssh://git@code.aliyun.com:zouke-npm/wapp-lib.git#c38daa91b02db4791a727f453c4e46aab683c2ec"
+  resolved "git+ssh://git@code.aliyun.com:zouke-npm/wapp-lib.git#3ebb14a6dd19ad244e9a6f097004963dfc694dd2"
   dependencies:
     lodash-es "^4.17.15"
 

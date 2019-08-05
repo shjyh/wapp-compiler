@@ -11,4 +11,5 @@ test('表达式解析测试', ()=>{
     expect(parseVarible('tour.abc(item, \'other\', rrr)')).toEqual(['item', 'rrr']);
     expect(parseVarible('true')).toEqual([]);
     expect(parseVarible(`$images['abc' + aa]`)).toEqual(['$images', 'aa']);
+    expect(parseVarible('!basic')).toEqual(['basic']);
 });

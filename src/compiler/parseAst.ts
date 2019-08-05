@@ -289,8 +289,12 @@ function combinArray(raw: any[], into: any[]){
 }
 
 function parseMustacheTpl(val: string): string[]{
+    //!basic 会解析成 ['!','basic', ...] 需特殊处理
     const resultExps: string[] = mustache.parse(val)
-        .filter(n=>n[0]==='name').map(n=>n[1]);
+        .filter(n=>n[0]==='name'||n[0]==='!').map(n=>{
+            if(n[0]==='name') return n[1];
+            return n[0] + n[1];
+        });
     const vals = [];
     for(let exp of resultExps){
         combinArray(vals, parseVarible(exp));
