@@ -410,19 +410,17 @@ export class BuildSystem {
         const imageManifest = {};
         for(let c of [...this.pugCompilers, ...this.sfcCompilers]){
             const images = c.getImages();
-            const subpackage = c.matchSubpackage(subPackages);
+            const subpackage = c.matchSubpackage(subPackages)||'';
 
             for(let image of images){
-                //root module
-                if(imageManifest[image] === ('images/' + image)) continue;
-                if(!subPackages||!imageManifest[image]){
-                    imageManifest[image] = ('images/' + image);
+                const thisSubPackageImagePath = path.join(subpackage, 'images/',  image);
+
+                if(!imageManifest[image]){
+                    imageManifest[image] = thisSubPackageImagePath;
                     continue;
                 }
-
-                const thisSubPackageImagePath = 'images/' + path.join(subpackage, image);
                 if(imageManifest[image]!==thisSubPackageImagePath){
-                    imageManifest[image] = image;
+                    imageManifest[image] = path.join('images/', image);
                 }
             }
         }
