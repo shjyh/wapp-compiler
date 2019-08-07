@@ -8,6 +8,7 @@ import SFCCompiler from './compiler/SFCCompiler'
 import ResourceCompiler from './compiler/ResourceCompiler';
 import PugCompiler from './compiler/PugCompiler';
 import SvgCompiler from './compiler/SvgCompiler'
+import RawCompiler from './compiler/RawCompiler';
 import getBabelConfig from './compiler/babel.config';
 import FileCache from './FileCache';
 import * as fs from 'fs';
@@ -67,6 +68,7 @@ export class BuildSystem {
     private isReadDone = false;
     private npmModules: string [] = [];
 
+    private rawCompilers: RawCompiler[] = [];
     private tsCompilers: TsCompiler[] = [];
     private pugCompilers: PugCompiler[] = [];
     private sassCompilers: SassCompiler[] = [];
@@ -139,14 +141,20 @@ export class BuildSystem {
         const srcRelativePath = path.relative(this.src, f);
         const extname = path.extname(srcRelativePath);
         switch(extname){
-            case '.ts': case '.js': case '.wxs':
+            case '.ts': case '.js':
                 if(srcRelativePath.endsWith('.d.ts')) break;
                 this.tsCompilers.push(new TsCompiler(
                     srcRelativePath,  readFileAsString(f), this.npmModules, 
                     srcRelativePath.endsWith('.min.js') ? false : this.compress, 
                     this.env,
                     // functional-pages文件夹下文件和.wxs文件不要转译
-                    srcRelativePath.includes('functional-pages/')||extname==='.wxs'||srcRelativePath.endsWith('.min.js')
+                    srcRelativePath.includes('functional-pages/')||srcRelativePath.endsWith('.min.js')
+                ));
+                break;
+                
+            case '.wxs':
+                this.rawCompilers.push(new RawCompiler(
+                    srcRelativePath, readFileAsString(f)
                 ));
                 break;
             case '.wxml':
@@ -190,9 +198,12 @@ export class BuildSystem {
         const srcRelativePath = path.relative(this.src, f);
         const extname = path.extname(srcRelativePath);
         switch(extname){
-            case '.ts': case '.js': case '.wxs':
+            case '.ts': case '.js':
                 if(srcRelativePath.endsWith('.d.ts')) break;
                 removeCompiler(this.tsCompilers, srcRelativePath);
+                break;
+            case '.wxs':
+                removeCompiler(this.rawCompilers, srcRelativePath);
                 break;
             case '.wxml':
                 removeCompiler(this.pugCompilers, srcRelativePath);
@@ -221,9 +232,12 @@ export class BuildSystem {
         const srcRelativePath = path.relative(this.src, f);
         const extname = path.extname(srcRelativePath);
         switch(extname){
-            case '.ts': case '.js': case '.wxs':
+            case '.ts': case '.js':
                 if(srcRelativePath.endsWith('.d.ts')) break;
                 setCompilerContent(this.tsCompilers, srcRelativePath, readFileAsString(f));
+                break;
+            case '.wxs':
+                setCompilerContent(this.rawCompilers, srcRelativePath, readFileAsString(f));
                 break;
             case '.wxml':
                 setCompilerContent(this.pugCompilers, srcRelativePath, readFileAsString(f));
@@ -349,7 +363,8 @@ export class BuildSystem {
                 ...this.sassCompilers,
                 ...this.sfcCompilers,
                 ...this.jsonCompilers,
-                ...this.resourceCompilers
+                ...this.resourceCompilers,
+                ...this.rawCompilers
             ]){
                 if(c.getLastError()){
                     console.log(pe.render(c.getLastError()))
@@ -370,7 +385,7 @@ export class BuildSystem {
                 files['app.json'] = JSON.stringify(appJson);
             }
 
-            for(let c of [...this.tsCompilers, ...this.sassCompilers, ...this.jsonCompilers]){
+            for(let c of [...this.tsCompilers, ...this.sassCompilers, ...this.jsonCompilers, ...this.rawCompilers]){
                 Object.assign(files, c.getResult());
             }
             for(let c of [...this.pugCompilers, ...this.sfcCompilers, ...this.resourceCompilers]){
