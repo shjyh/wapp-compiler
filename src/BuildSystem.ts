@@ -98,7 +98,10 @@ export class BuildSystem {
 
         //.tmp/lib.js文件，用于webpack
         this.npmlibjs = path.join(this.src, '.tmp/lib.js');
-        fs.mkdirSync(path.dirname(this.npmlibjs), { recursive: true });
+        const npmlibDir = path.dirname(this.npmlibjs);
+        if(!fs.existsSync(npmlibDir)){
+            fs.mkdirSync(npmlibDir, { recursive: true });
+        }
 
         if(this.watch){
             fs.writeFileSync(this.npmlibjs, '');

@@ -78,7 +78,7 @@ export default class PugCompiler implements Compiler{
 
     matchSubpackage(subpackages: string[]): string {
         for(let pack of subpackages){
-            if(this.path.startsWith(pack)) return pack;
+            if(this.path.startsWith(pack + '/')) return pack;
         }
         return null;
     }
