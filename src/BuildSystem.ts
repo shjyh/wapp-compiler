@@ -300,7 +300,7 @@ export class BuildSystem {
                         loader: path.resolve(__dirname, '../regenerator-loader')
                     },
                     {
-                        test: /\.ts$/,
+                        test: /@zouke\/wapp-lib\/.*\.[tj]s$/,
                         loader: 'babel-loader',
                         options: getBabelConfig(false)
                     }
