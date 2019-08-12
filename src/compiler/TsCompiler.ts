@@ -40,7 +40,7 @@ export default class TsCompiler implements Compiler{
             if(this.useRaw){
                 this.transformCode = this.content;
             }else{
-                const options =  getBabelConfig('/<srcDir>/' + this.path);
+                const options =  getBabelConfig('cjs', '/<srcDir>/' + this.path);
                 if(this.compress){
                     options.sourceMaps = false;
                 }
@@ -49,6 +49,7 @@ export default class TsCompiler implements Compiler{
             }
             if(this.compress){
                 this.transformCode = minify(this.transformCode, {
+                    toplevel: true,
                     output: {
                         comments: false
                     }

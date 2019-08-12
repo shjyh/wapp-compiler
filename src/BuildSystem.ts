@@ -302,7 +302,7 @@ export class BuildSystem {
                     {
                         test: /\.ts$/,
                         loader: 'babel-loader',
-                        options: getBabelConfig()
+                        options: getBabelConfig(false)
                     }
                 ]
             },

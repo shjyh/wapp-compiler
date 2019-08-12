@@ -1,6 +1,6 @@
 import { TransformOptions } from "@babel/core";
 
-export default function(filename?: string): TransformOptions{
+export default function(modules: "amd"|"umd"|"systemjs"|"commonjs"|"cjs"|"auto"|false = 'cjs', filename?: string): TransformOptions{
     return Object.assign(filename?{
         filename,
         configFile: false,
@@ -10,7 +10,7 @@ export default function(filename?: string): TransformOptions{
             [
                 "@babel/preset-env",
                 {
-                    modules: 'cjs'
+                    modules
                 }
             ],
             [
@@ -21,6 +21,14 @@ export default function(filename?: string): TransformOptions{
             ]
         ],
         plugins: [
+            ...(modules==='cjs'||modules==='commonjs'?[
+                [
+                    "@babel/plugin-transform-modules-commonjs",
+                    {
+                        strict: false
+                    }
+                ]
+            ]:[]),
             [
                 "@babel/plugin-transform-runtime",
                 {
