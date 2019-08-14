@@ -12,7 +12,9 @@ export default function run(src: string, dist: string, {
     env?: {[key: string]: boolean|string},
     wrapperPath?: string     //Page来源文件
 } = {}){
-    del.sync(dist);
+    del.sync(dist, {
+        force: true
+    });
 
     src = path.resolve(src);
     dist = path.resolve(dist);
