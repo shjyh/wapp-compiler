@@ -15,6 +15,9 @@ block content
     view(wx:for="{{otherArr}}")
         view(wx:for="{{item}}")
             view {{item.value}}
+    view(wx:for="{{aArr}}")
+        view(wx:for="{{item}}")
+            view {{item}}
 `;
 
 const otherPugCode = `
@@ -33,6 +36,16 @@ view(data-a="{{showCoupons[0]}}")
 view(wx:for="{{showCoupons}}") {{item.amt}}
 view(wx:for="{{aList}}" wx:for-item="c")
     view(data-item="{{c}}") {{c.name}}
+view(wx:for="{{otherList}}" wx:for-item="c")
+    view(wx:for="{{c.list}}")
+        view(data-item="{{item}}")
+view(wx:for="{{bList}}" wx:for-item="c")
+    view(wx:for="{{c}}")
+        view {{item.prop}}
+        view(data-item="{{c}}")
+view(wx:for="{{cList}}" wx:for-item="c")
+    view(wx:for="{{c}}")
+        view {{item}}
 `
 
 test('pug 解析', ()=>{
@@ -59,6 +72,13 @@ test('pug 解析', ()=>{
             watches: {
                 path: '',
                 watches: ['value']
+            }
+        },
+        {
+            path: 'aArr',
+            watches: {
+                path: '',
+                watches: null
             }
         }
     ]);
@@ -87,6 +107,18 @@ test('pug 解析', ()=>{
             watches: ['status', 'amt']
         },
         'showCoupons',
-        'aList'
+        'aList',
+        {
+            path: 'otherList',
+            watches: ['list']
+        },
+        'bList',
+        {
+            path: 'cList',
+            watches: {
+                path: '',
+                watches: null
+            }
+        }
     ])
 });

@@ -329,10 +329,20 @@ function combineWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars
                 break;
             }
             if(v===forBlock.itemName){
+                //上一层的forBlock中的watches中，需要清空对应的arrayWatch为stringWatch
+                const prevForBlock = forBlocks[forBlocks.indexOf(forBlock) + 1];
                 forBlock.watches = forBlock.watches.map(watch=>{
                     if(typeof watch === 'string') return watch;
-                    
-                    insertWatchStringItem(result.watchItems, watch.path);
+
+                    if(prevForBlock){
+                        prevForBlock.watches.forEach(w=>{
+                            if(typeof w === 'string') return;
+                            if(Array.isArray(w.watches)) insertWatchStringItem(w.watches, watch.path);
+                            else w.watches.watches = null;
+                        })
+                    }else{
+                        insertWatchStringItem(result.watchItems, watch.path);
+                    }
                     return watch.path;
                 });
                 resolved = true;
