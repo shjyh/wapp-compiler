@@ -27,6 +27,10 @@ block(wx:for="{{contentList}}" wx:key="$random" wx:for-item="node")
         view.text(style="color:{{node.color}}" class="{{node.align}}")
             image.star(src="@image/jr/star.svg") 
             | {{item.c}} {{node.color}}
+view(data-a="{{coupons[0].status}}")
+view(wx:for="{{coupons}}") {{item.amt}}
+view(data-a="{{showCoupons[0]}}")
+view(wx:for="{{showCoupons}}") {{item.amt}}
 `
 
 test('pug 解析', ()=>{
@@ -75,6 +79,11 @@ test('pug 解析', ()=>{
                 "color", "align"
             ],
             key: "$random"
-        }
+        },
+        {
+            path: "coupons",
+            watches: ['status', 'amt']
+        },
+        'showCoupons'
     ])
 });

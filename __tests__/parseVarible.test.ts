@@ -12,4 +12,5 @@ test('表达式解析测试', ()=>{
     expect(parseVarible('true')).toEqual([]);
     expect(parseVarible(`$images['abc' + aa]`)).toEqual(['$images', 'aa']);
     expect(parseVarible('!basic')).toEqual(['basic']);
+    expect(parseVarible('a[0].status')).toEqual(['a[0].status']);
 });

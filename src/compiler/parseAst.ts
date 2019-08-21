@@ -95,7 +95,7 @@ function parseAstTag(astTag: AstTag, result: AstParseResult, forBlocks: WxForBlo
     }
 
     for(let val of normalAttrVals){
-        combinWatchItems(result, forBlocksShadow, parseMustacheTpl(val));
+        combineWatchItems(result, forBlocksShadow, parseMustacheTpl(val));
     }
     
     parseAstNodes(astTag.block.nodes, result, forBlocksShadow);
@@ -120,7 +120,7 @@ function parseAstNodes(nodes: AstNode[], result: AstParseResult, forBlocks: WxFo
     }
 }
 function parseAstText(astText: AstText, result: AstParseResult, forBlocks: WxForBlock[]){
-    combinWatchItems(result, forBlocks, parseMustacheTpl(astText.val));
+    combineWatchItems(result, forBlocks, parseMustacheTpl(astText.val));
 }
 
 function parseImage(imageTag: AstTag, result: AstParseResult){
@@ -194,7 +194,7 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
 
             forBlock.watches.forEach(watch => {
                 if(Array.isArray(watch.watches)){
-                    const w = combineArrayWatchItems(watch.watches, getArrayWatchItem(path, key));
+                    const w = insertWatchArrayItem(watch.watches, getArrayWatchItem(path, key));
                     if(w) thisForBlock.watches.push(w);
                 }
             })
@@ -202,19 +202,27 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
         }
 
         if(!resolved){
-            const w = combineArrayWatchItems(result.watchItems, getArrayWatchItem(v, key));
+            const w = insertWatchArrayItem(result.watchItems, getArrayWatchItem(v, key));
             if(w) thisForBlock.watches.push(w);
         }
     }
     forBlocks.unshift(thisForBlock);
 }
 
-function combineArrayWatchItems(watches: WatchItem[], arrayWatch: ArrayWatchItem): ArrayWatchItem|false{
+function insertWatchArrayItem(watches: WatchItem[], arrayWatch: ArrayWatchItem): ArrayWatchItem|false{
+    const filterWatches: WatchItem[] = [];
 
-    const filterWatches = watches.filter(w=>{
+    // array watch 子项，需要合并进入该ArrayWatch
+    let childWatches: WatchItem[] = [];
+
+    for(let w of watches){
         const path = typeof w === 'string' ? w : w.path;
-        return !path.startsWith(arrayWatch.path + '.')&&!path.startsWith(arrayWatch.path + '[');
-    });
+        if(!path.startsWith(arrayWatch.path + '.')&&!path.startsWith(arrayWatch.path + '[')){
+            filterWatches.push(w);
+        }else{
+            if(path.startsWith(arrayWatch.path + '[')) childWatches.push(w);
+        }
+    }
     watches.length = 0;
     watches.push(...filterWatches);
 
@@ -224,16 +232,91 @@ function combineArrayWatchItems(watches: WatchItem[], arrayWatch: ArrayWatchItem
     });
     
     if(!alreadyInclude){
+        const result = combineChildWatches(arrayWatch);
+        if(typeof result === 'string'){
+            insertWatchStringItem(watches, result);
+            return false;
+        }
         watches.push(arrayWatch);
         return arrayWatch;
     }
 
     if(typeof alreadyInclude === 'string') return false;
     if(alreadyInclude.path!==arrayWatch.path) return false;
+
+    if(!Array.isArray(alreadyInclude.watches)&&!Array.isArray(arrayWatch.watches)){
+        combineNestedArrayWatch(alreadyInclude.watches, arrayWatch.watches);
+        return alreadyInclude;
+    }
+    //如果只有一个是嵌套数组，返回alreadyInclude。
+    if(!Array.isArray(alreadyInclude.watches)||!Array.isArray(arrayWatch.watches)){
+        throw new Error('模板嵌套数组错误');
+    }
+
+    for(let w of arrayWatch.watches){
+        insertWatchItem(alreadyInclude.watches, w)
+    }
     return alreadyInclude;
+
+    //合并数组子项，若合并后需返回整个数组项，则返回该数组path
+    function combineChildWatches(arrayWatch: ArrayWatchItem): ArrayWatchItem|string{
+        if(!Array.isArray(arrayWatch.watches)){
+            childWatches = childWatches.map(w=>{
+                if(typeof w === 'string') return unwrapperArrayParent(w, arrayWatch.path);
+                else return {
+                    path: unwrapperArrayParent(w.path, arrayWatch.path),
+                    watches: w.watches,
+                    key: w.key
+                }
+            });
+            return combineChildWatches(arrayWatch.watches);
+        };
+        for(let w of childWatches){
+            if(typeof w === 'string'){
+                const p = unwrapperArrayParent(w, arrayWatch.path);
+                if(p==='') return arrayWatch.path;
+                else insertWatchStringItem(arrayWatch.watches, p);
+            }
+            else{
+                const p = unwrapperArrayParent(w.path, arrayWatch.path);
+                if(p==='') return arrayWatch.path;
+                insertWatchArrayItem(arrayWatch.watches, {
+                    path: p,
+                    watches: w.watches,
+                    key: w.key
+                });
+            }
+        }
+        return arrayWatch;
+    }
+
+    function unwrapperArrayParent(path:string, arrayPath:string): string{
+        if(!path.startsWith(arrayPath + '[')) throw new Error('模板数组错误');
+        path = path.substring(arrayPath.length);
+        if(!/^\[[0-9]+?\]\.?/.test(path)) throw new Error('模板数组错误');
+        return path.replace(/^\[[0-9]+?\]\.?/, '');
+    }
 }
 
-function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars: string[]){
+function insertWatchItem(watches: WatchItem[], watch: ArrayWatchItem|string){
+    if(typeof watch === 'string') insertWatchStringItem(watches, watch);
+    else insertWatchArrayItem(watches, watch);
+}
+
+function combineNestedArrayWatch(a1: NestedArrayWatchItem, a2: NestedArrayWatchItem){
+    if(!Array.isArray(a1.watches)&&!Array.isArray(a2.watches)){
+        combineNestedArrayWatch(a1.watches, a2.watches);
+        return;
+    }
+    if(Array.isArray(a1.watches)&&Array.isArray(a2.watches)){
+        for(let w of a2.watches) insertWatchItem(a1.watches, w);
+        return;
+    }
+
+    throw new Error('模板嵌套数组错误');
+}
+
+function combineWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars: string[]){
     for(let v of vars){
         let resolved = false;
         for(let forBlock of forBlocks){
@@ -267,12 +350,17 @@ function combinWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars:
 }
 
 function insertWatchStringItem(watches: WatchItem[], watchItem: string){
+    //过滤 ${watchItem}.$any 和 ${watchItem}[$any] 或 watchItem相同的arrayItem
     const filterWatches = watches.filter(w=>{
+        if(typeof w !== 'string' && w.path === watchItem) return false;
+
         const path = typeof w === 'string' ? w : w.path;
         return !path.startsWith(watchItem + '.')&&!path.startsWith(watchItem + '[');
     });
     watches.length = 0;
     watches.push(...filterWatches);
+
+    //若当前监听列表中存在watchItem或watchItem父项，不做处理
     if(!watches.find(w=>{
         const path = typeof w==='string' ? w : w.path;
         return watchItem.startsWith(path + '.')||watchItem.startsWith(path + '[')||watchItem === path;
@@ -281,7 +369,7 @@ function insertWatchStringItem(watches: WatchItem[], watchItem: string){
     }
 }
 
-function combinArray(raw: any[], into: any[]){
+function combineArray(raw: any[], into: any[]){
     for(let item of into){
         if(raw.includes(item)) continue;
         raw.push(item);
@@ -297,7 +385,7 @@ function parseMustacheTpl(val: string): string[]{
         });
     const vals = [];
     for(let exp of resultExps){
-        combinArray(vals, parseVarible(exp));
+        combineArray(vals, parseVarible(exp));
     }
     return vals;
 }
