@@ -31,6 +31,8 @@ view(data-a="{{coupons[0].status}}")
 view(wx:for="{{coupons}}") {{item.amt}}
 view(data-a="{{showCoupons[0]}}")
 view(wx:for="{{showCoupons}}") {{item.amt}}
+view(wx:for="{{aList}}" wx:for-item="c")
+    view(data-item="{{c}}") {{c.name}}
 `
 
 test('pug 解析', ()=>{
@@ -84,6 +86,7 @@ test('pug 解析', ()=>{
             path: "coupons",
             watches: ['status', 'amt']
         },
-        'showCoupons'
+        'showCoupons',
+        'aList'
     ])
 });

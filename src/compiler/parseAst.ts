@@ -36,7 +36,7 @@ export interface AstParseResult {
 }
 
 interface WxForBlock {
-    watches: ArrayWatchItem[];
+    watches: WatchItem[];
     itemName: string;
     indexName: string;
 }
@@ -172,6 +172,7 @@ function getArrayWatchItem(path, key): ArrayWatchItem{
     return item;
 }
 
+// 合并当前for block域
 function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars: string[], key: string, forBlocks: WxForBlock[]){
     for(let v of vars){
         let resolved = false;
@@ -184,6 +185,8 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
                 forBlock.watches.forEach(watch=>{
                     const thisBlockWatch: NestedArrayWatchItem = getArrayWatchItem('', key) as NestedArrayWatchItem;
                     thisForBlock.watches.push(thisBlockWatch);
+
+                    if(typeof watch === 'string') return;
                     watch.watches = thisBlockWatch;
                 });
                 resolved = true;
@@ -193,6 +196,7 @@ function combineForBlock(result: AstParseResult, thisForBlock: WxForBlock, vars:
             if(!path) continue;
 
             forBlock.watches.forEach(watch => {
+                if(typeof watch === 'string') return;
                 if(Array.isArray(watch.watches)){
                     const w = insertWatchArrayItem(watch.watches, getArrayWatchItem(path, key));
                     if(w) thisForBlock.watches.push(w);
@@ -325,8 +329,11 @@ function combineWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars
                 break;
             }
             if(v===forBlock.itemName){
-                forBlock.watches.forEach(watch=>{
-                    watch.watches = null;
+                forBlock.watches = forBlock.watches.map(watch=>{
+                    if(typeof watch === 'string') return watch;
+                    
+                    insertWatchStringItem(result.watchItems, watch.path);
+                    return watch.path;
                 });
                 resolved = true;
                 break;
@@ -335,7 +342,7 @@ function combineWatchItems(result: AstParseResult, forBlocks: WxForBlock[], vars
             if(!path) continue;
 
             forBlock.watches.forEach(watch => {
-                if(!watch.watches) return;
+                if(typeof watch === 'string') return;
                 if(!Array.isArray(watch.watches)) return;
 
                 insertWatchStringItem(watch.watches, path);
