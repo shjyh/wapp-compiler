@@ -478,6 +478,8 @@ function resolveGlobal(global) {
     return global;
 };
 self=global=resolveGlobal(global);
+delete self.MutationObserver;
+delete self.WebKitMutationObserver;
 module.exports = {
     c: require('@zouke/wapp-lib/wrapper/CreateWrapperComponent').default,
     p: require('@zouke/wapp-lib/wrapper/CreateWrapperPage').default,
