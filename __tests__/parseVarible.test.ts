@@ -13,4 +13,5 @@ test('表达式解析测试', ()=>{
     expect(parseVarible(`$images['abc' + aa]`)).toEqual(['$images', 'aa']);
     expect(parseVarible('!basic')).toEqual(['basic']);
     expect(parseVarible('a[0].status')).toEqual(['a[0].status']);
+    expect(parseVarible("currentPackage.needDlv==false?'无':currentPackage.dlvCompany")).toEqual(["currentPackage.needDlv", "currentPackage.dlvCompany",]);
 });

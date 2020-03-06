@@ -14,6 +14,14 @@ export default function parse(express: string): string[]{
         const token = matchToToken(match);
         switch(token.type){
             case 'name':
+                if(['undefined', 'null', 'true', 'false'].includes(token.value)){
+                    if(lastName.endsWith(".")||lastName.endsWith("[")){
+                        lastName += token.value;
+                    }else{
+                        completeLastName();
+                    }
+                    break;
+                }
                 if(!lastName.endsWith('.')){
                     completeLastName();
                 }
