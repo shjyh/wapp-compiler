@@ -207,9 +207,10 @@ export class BuildSystem {
                 removeCompiler(this.tsCompilers, srcRelativePath);
                 break;
             case '.wxs':
+            case '.wxml':
                 removeCompiler(this.rawCompilers, srcRelativePath);
                 break;
-            case '.wxml':
+            case '.pug':
                 removeCompiler(this.pugCompilers, srcRelativePath);
                 break;
             case '.wxss':
@@ -241,9 +242,10 @@ export class BuildSystem {
                 setCompilerContent(this.tsCompilers, srcRelativePath, readFileAsString(f));
                 break;
             case '.wxs':
+            case '.wxml':
                 setCompilerContent(this.rawCompilers, srcRelativePath, readFileAsString(f));
                 break;
-            case '.wxml':
+            case '.pug':
                 setCompilerContent(this.pugCompilers, srcRelativePath, readFileAsString(f));
                 break;
             case '.wxss':
