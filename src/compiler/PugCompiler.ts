@@ -83,7 +83,7 @@ export default class PugCompiler implements Compiler{
         return null;
     }
     getResult(imageMap: {[key: string]: string}): CompileResult<string> {
-        return {[this.path]: this.xmlGenFn({
+        return {[this.path.replace(/.pug$/, '.wxml')]: this.xmlGenFn({
             images: imageMap
         })};
     }

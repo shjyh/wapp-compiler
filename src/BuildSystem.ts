@@ -156,11 +156,12 @@ export class BuildSystem {
                 break;
                 
             case '.wxs':
+            case '.wxml':
                 this.rawCompilers.push(new RawCompiler(
                     srcRelativePath, readFileAsString(f)
                 ));
                 break;
-            case '.wxml':
+            case '.pug':
                 this.pugCompilers.push(new PugCompiler(
                     this.src, srcRelativePath, readFileAsString(f)
                 ));
