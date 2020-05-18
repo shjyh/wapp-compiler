@@ -4,7 +4,7 @@ export default function(modules: "amd"|"umd"|"systemjs"|"commonjs"|"cjs"|"auto"|
     return Object.assign(filename?{
         filename,
         configFile: false,
-        sourceMaps: 'inline',
+        sourceMaps: 'inline' as TransformOptions["sourceMaps"],
     }:{}, {
         presets: [
             [
