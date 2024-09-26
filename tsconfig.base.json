@@ -6,6 +6,7 @@
         "moduleResolution": "node",
         "noImplicitThis": true,
         "esModuleInterop": true,
+	"skipLibCheck": true,
         "lib": [
             "esnext"
         ],

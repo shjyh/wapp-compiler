@@ -1,10 +1,10 @@
 import { TransformOptions } from "@babel/core";
 
 export default function(filename?: string): TransformOptions{
-    return Object.assign(filename?{
+    return Object.assign(filename ? {
         filename,
         configFile: false,
-        sourceMaps: 'inline',
+        sourceMaps: 'inline' as "inline",
     }:{}, {
         presets: [
             [
