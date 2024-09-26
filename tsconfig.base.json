@@ -5,6 +5,7 @@
         "module": "commonjs",
         "moduleResolution": "node",
         "noImplicitThis": true,
+	"skipLibCheck": true,
         "esModuleInterop": true,
         "lib": [
             "esnext"

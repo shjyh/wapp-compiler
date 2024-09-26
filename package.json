@@ -31,7 +31,7 @@
         "@types/svgo": "^1.2.1",
         "@types/terser-webpack-plugin": "^1.2.1",
         "@types/webpack": "^4.32.1",
-        "@zouke/wapp-lib": "git+ssh://git@code.aliyun.com:zouke-npm/wapp-lib.git#current",
+        "@zouke/wapp-lib": "git+ssh://git@codeup.aliyun.com:6272837a5b46541dd2fef960/zouke-npm/wapp-lib.git#current",
         "autoprefixer": "^9.6.1",
         "babel-loader": "^8.0.6",
         "chalk": "^2.4.2",
@@ -60,7 +60,7 @@
         "svgo": "^1.3.0",
         "terser": "^4.1.2",
         "terser-webpack-plugin": "^1.3.0",
-        "typescript": "^3.5.3",
+        "typescript": "^4.7.4",
         "webpack": "^4.36.1"
     },
     "devDependencies": {}
