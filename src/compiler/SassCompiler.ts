@@ -29,9 +29,8 @@ export default class SassCompiler implements Compiler{
     private compile(){
         this.error = null;
         try{
-            this.transformCode = csso.minify(postcssRender.process(sass.renderSync({
-                data: this.content,
-                includePaths: [this.src, path.join(this.src, this.path)]
+            this.transformCode = csso.minify(postcssRender.process(sass.compileString(this.content, {
+                loadPaths: [this.src, path.join(this.src, this.path)]
             }).css).css, {
                 comments: false
             }).css.replace(/\@import\s+url\((.+?)\)/g, '@import \'$1\'');
