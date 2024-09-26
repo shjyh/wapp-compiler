@@ -37,7 +37,9 @@ export default function(modules: "amd"|"umd"|"systemjs"|"commonjs"|"cjs"|"auto"|
             ],
             ["@babel/plugin-proposal-decorators", { legacy: true }],
             "@babel/plugin-syntax-class-properties",
-            ["@babel/plugin-proposal-class-properties", { "loose": true }]
+            ["@babel/plugin-proposal-class-properties", { "loose": true }],
+            ["@babel/plugin-transform-private-methods", { "loose": true }],
+            ["@babel/plugin-transform-private-property-in-object", { "loose": true }]
         ]
     });
 }
